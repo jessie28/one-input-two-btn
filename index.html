@@ -1,0 +1,79 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<input type="text" id="inputId">
+<button id="buttonA">A</button>
+<button id="buttonB">B</button>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.4.4/babel.min.js"></script>-->
+<script>
+    let btnArray = []
+    let currentBtn = null
+    function fillInput(text) {
+        document.getElementsByTagName('input')[0].value = text;
+    }
+    // function onBtnAClick() {
+    //     console.log("onBtnAClick")
+    //     onBtnClick(5000,"a").then((value)=>{
+    //         fillInput(value)
+    //     })
+    // }
+    // function onBtnBClick() {
+    //     console.log("onBtnBClick");
+    //     onBtnClick(500,"a").then((value)=>{
+    //         fillInput(value)
+    //     })
+    // }
+
+    async function handlePromise(ms,value) {
+        console.log("ms",ms)
+        console.log("value",value);
+        await new Promise((resolve,reject)=>{
+            setTimeout(resolve,ms,value);
+        }).then((value)=>{
+            console.log("handlePromise ",value);
+            fillInput(value);
+            btnArray.shift();
+            currentBtn = null;
+            handleBtnClick();
+        })
+    }
+
+    async function handleBtnClick(){
+        console.log("handleBtnClick ",currentBtn,btnArray)
+        if(!currentBtn && btnArray.length > 0){
+            currentBtn = btnArray[0];
+            let info = await handlePromise.call(null,currentBtn.ms,currentBtn.value);
+        }
+    }
+
+    async function onBtnClick(ms,value) {
+        console.log("onBtnAClick");
+        let btnIndex = btnArray.findIndex((b)=>b.ms === ms && b.value === value);
+        console.log(btnIndex);
+        if(btnIndex < 0){
+            btnArray.push({
+                ms,value
+            })
+        }
+        handleBtnClick();
+    }
+
+
+    // async function onBtnBClick() {
+    //     console.log("onBtnBClick")
+    //     let value = await onBtnClick.call(null,500,"b");
+    //     fillInput(value)
+    // }
+
+
+    function main() {
+        document.getElementById("buttonA").addEventListener('click',onBtnClick.bind(null,5000,"a"));
+        document.getElementById("buttonB").addEventListener('click',onBtnClick.bind(null,1000,"b"));
+    }
+    main();
+</script>
+</body>
+
+</html>
